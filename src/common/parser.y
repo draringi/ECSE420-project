@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "parser.yy.h"
+#include "matrix.h"
 void code_errormsg(char*);
 void yyerror() { code_errormsg("syntax error"); }
 void code_errormsg(char* reason) { fprintf (stderr, "Invalid: %s near %s on line %d\n", reason, yytext, yylineno); exit(EXIT_FAILURE); }

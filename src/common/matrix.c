@@ -1,6 +1,7 @@
 #include "matrix.h"
 #include <stdlib.h>
 #include <stdio.h>
+#include <limits.h>
 
 struct ENTRY_LIST {
 	struct MATRIX_ENTRY *entry;
@@ -176,4 +177,100 @@ void clean_matrix(void){
 		col_start=NULL;
 	}
 	free_matrix();
+}
+
+void column_append(struct MATRIX_COL* head, struct MATRIX_COL* new){
+	while(head->right){
+		head = head->right;
+	}
+	head->right = new;
+	new->left = head;
+	new->right = NULL;
+}
+
+void row_append(struct MATRIX_ROW* head, struct MATRIX_ROW* new){
+	while (head->down) {
+		head = head->down;
+	}
+	head->down = new;
+	new->up = head;
+	new->down = NULL;
+}
+
+int column_cardinality(struct MATRIX_COL* col){
+	int c = 0;
+	struct MATRIX_ENTRY *e = col->top;
+	int s;
+	if(e) {
+		s = e->y;
+		c = 1;
+		e = e->down;
+	}
+	while(e && (e->y != s)){
+		c++;
+		e = e->down;
+	}
+	return c;
+}
+
+struct MATRIX* get_matrix(void){
+	struct MATRIX* m = malloc(sizeof(struct MATRIX));
+	m->xLen = size_x;
+	m->yLen = size_y;
+	m->entries = entry_list;
+	struct MATRIX_COL* chead = malloc(sizeof(struct MATRIX_COL));
+	chead->index = 0;
+	chead->top = col_start[0];
+	chead->cardinality = column_cardinality(chead);
+	int min_cardinality = chead->cardinality;
+	chead->right = NULL;
+	int i;
+	for (i=1; i < size_x; i++){
+		struct MATRIX_COL* col = malloc(sizeof(struct MATRIX_COL));
+		col->index = i;
+		col->top = col_start[i];
+		col->cardinality = column_cardinality(col);
+		if(col->cardinality < min_cardinality){
+			min_cardinality = col->cardinality;
+		}
+		column_append(chead, col);
+	}
+	struct MATRIX_COL* clast = chead;
+	while(clast->right){
+		clast = clast->right;
+	}
+	clast->right = chead;
+	chead->left = clast;
+	m->columns = chead;
+	m->min_cardinality = min_cardinality;
+	struct MATRIX_ROW* rhead = malloc(sizeof(struct MATRIX_ROW));
+	rhead->index = 0;
+	rhead->start = row_start[0];
+	rhead->down = NULL;
+	for (i=1; i < size_y; i++){
+		struct MATRIX_ROW* row = malloc(sizeof(struct MATRIX_ROW));
+		row->index = i;
+		row->start = row_start[i];
+		row_append(rhead, row);
+	}
+	struct MATRIX_ROW* rlast = rhead;
+	while(rlast->down){
+		rlast = rlast->down;
+	}
+	rlast->down = rhead;
+	rhead->up = rlast;
+	m->rows = rhead;
+	return m;
+}
+
+void recalculate_cardinality(struct MATRIX* matrix) {
+	struct MATRIX_COL* col = matrix->columns;
+	int min_cardinality = INT_MAX;
+	do{
+		col->cardinality = column_cardinality(col);
+		if(min_cardinality > col->cardinality){
+			min_cardinality = col->cardinality;
+		}
+	} while (col != matrix->columns);
+	matrix->min_cardinality = min_cardinality;
 }
