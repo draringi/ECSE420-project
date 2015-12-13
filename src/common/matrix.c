@@ -265,6 +265,9 @@ struct MATRIX* get_matrix(void){
 
 void recalculate_cardinality(struct MATRIX* matrix) {
 	struct MATRIX_COL* col = matrix->columns;
+	if(!col){
+		return;
+	}
 	int min_cardinality = INT_MAX;
 	do{
 		col->cardinality = column_cardinality(col);

@@ -6,8 +6,9 @@ GENFILES:= common/parser.yy.h common/parser.yy.c common/parser.tab.h common/pars
 COMMON_OBJ:=  common/parser.yy.o common/parser.tab.o common/matrix.o
 PRINT_OBJ:= common/printer.o
 SEQ_OBJ:= sequential/main.o sequential/dlx.o
+FORK_OBJ:= fork/main.o fork/forkx.o
 OBJFILES:= $(COMMON_OBJ)
-BINFILES:= sparse-print cover-seq
+BINFILES:= sparse-print cover-seq cover-fork
 
 all: $(BINFILES)
 
@@ -16,6 +17,9 @@ sparse-print: $(COMMON_OBJ) $(PRINT_OBJ)
 
 cover-seq: $(COMMON_OBJ) $(SEQ_OBJ)
 	@$(CC) $(LDFLAGS) $(COMMON_OBJ) $(SEQ_OBJ) -o cover-seq
+
+cover-fork: $(COMMON_OBJ) $(FORK_OBJ)
+	@$(CC) $(LDFLAGS) $(COMMON_OBJ) $(FORK_OBJ) -o cover-fork
 
 common/printer.o: common/printer.c common/matrix.h common/parser.yy.h
 	@$(CC) $(CFLAGS) common/printer.c -o common/printer.o
@@ -44,6 +48,13 @@ sequential/main.o: sequential/main.c common/parser.yy.h common/matrix.h sequenti
 
 sequential/dlx.o: sequential/dlx.c sequential/dlx.h common/matrix.h
 	@$(CC) $(CFLAGS) sequential/dlx.c -o sequential/dlx.o
+
+fork/main.o: fork/main.c common/parser.yy.h common/matrix.h fork/forkx.h
+	@$(CC) $(CFLAGS) fork/main.c -o fork/main.o
+
+fork/forkx.o: fork/forkx.c fork/forkx.h common/matrix.h
+	@$(CC) $(CFLAGS) fork/forkx.c -o fork/forkx.o
+
 
 clean:
 	-@$(RM) $(GENFILES) $(OBJFILES) $(BINFILES)

@@ -19,7 +19,6 @@ struct MATRIX_COL {
 
 struct MATRIX_ROW {
 	int index;
-	int cardinality;
 	struct MATRIX_ENTRY *start;
 	struct MATRIX_ROW *up, *down;
 };
