@@ -18,6 +18,7 @@ int main(int argc, char* argv[]){
   yyin = f;
   yyparse();
   fclose(f);
+  yylex_destroy();
   build_starts();
   link_matrix();
   struct MATRIX *matrix = get_matrix();
@@ -33,6 +34,6 @@ int main(int argc, char* argv[]){
   } else {
     printf("No Solution Found\n");
   }
-
+  free(matrix);
   return EXIT_SUCCESS;
 }

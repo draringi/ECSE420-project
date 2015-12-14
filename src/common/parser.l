@@ -1,6 +1,6 @@
 %{
 #include "parser.tab.h"
-
+void yyerror();
 %}
 
 %option outfile="common/parser.yy.c" header-file="common/parser.yy.h"

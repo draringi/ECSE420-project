@@ -1,7 +1,7 @@
 .PHONY: all clean check
 
-LDFLAGS:=-lfl -pipe -Wall -g
-CFLAGS:=-c -pipe -Wall -g -fstack-protector -I.
+LDFLAGS:=-lfl -Wall -g
+CFLAGS:=-c -Wall -g -fstack-protector -I.
 GENFILES:= common/parser.yy.h common/parser.yy.c common/parser.tab.h common/parser.tab.c
 COMMON_OBJ:=  common/parser.yy.o common/parser.tab.o common/matrix.o
 PRINT_OBJ:= common/printer.o
@@ -9,6 +9,7 @@ SEQ_OBJ:= sequential/main.o sequential/dlx.o
 FORK_OBJ:= fork/main.o fork/forkx.o
 OBJFILES:= $(COMMON_OBJ)
 BINFILES:= sparse-print cover-seq cover-fork
+CUDACC:=nvcc
 
 all: $(BINFILES)
 

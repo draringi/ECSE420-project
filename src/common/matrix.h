@@ -3,6 +3,8 @@
 
 #include <stdint.h>
 
+int yyparse(void);
+
 struct MATRIX_ENTRY {
 	int x, y;
 	struct MATRIX_ENTRY *up, *down, *left, *right;
@@ -38,8 +40,7 @@ void print_matrix(void);
 void link_matrix(void);
 void clean_matrix(void);
 struct MATRIX* get_matrix(void);
-struct MATRIX* clone_matrix(struct MATRIX* matrix);
 void recalculate_cardinality(struct MATRIX*);
-void free_matrix_clone(struct MATRIX* matrix);
+void free_matrix_object(struct MATRIX* matrix);
 
 #endif /* MATRIX_H */

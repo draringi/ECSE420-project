@@ -23,6 +23,7 @@ int main(int argc, char const *argv[]) {
   yyin = f;
   yyparse();
   fclose(f);
+  yylex_destroy();
   build_starts();
   link_matrix();
   struct MATRIX *matrix = get_matrix();

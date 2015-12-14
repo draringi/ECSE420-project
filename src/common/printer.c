@@ -17,6 +17,7 @@ int main(int argc, char* argv[]){
   if(f){
     fclose(f);
   }
+  yylex_destroy();
   build_starts();
   link_matrix();
   print_matrix();

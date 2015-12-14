@@ -27,6 +27,14 @@ int dlx_stack_pop(struct DLX_STACK **stack){
   return value;
 }
 
+void dlx_free_stack(struct DLX_STACK **stack){
+  while(*stack){
+    struct DLX_STACK *entry = *stack;
+    *stack = entry->next;
+    free(entry);
+  }
+}
+
 struct DLX_STACK* dlx(struct MATRIX* matrix){
   struct MATRIX_COL** column_index = calloc(matrix->xLen, sizeof(struct MATRIX_COL*));
   struct MATRIX_ROW** row_index = calloc(matrix->yLen, sizeof(struct MATRIX_ROW*));
@@ -94,8 +102,18 @@ struct DLX_STACK* dlx(struct MATRIX* matrix){
       recalculate_cardinality(matrix);
     }
   } while(matrix->columns);
+  int i;
+  for(i=0; i < matrix->xLen; i++){
+    free(column_index[i]);
+  }
+  for(i=0; i < matrix->yLen; i++){
+    free(row_index[i]);
+  }
   free(column_index);
   free(row_index);
+  dlx_free_stack(&row_check_stack);
+  dlx_free_stack(&column_stack);
+  dlx_free_stack(&row_remove_stack);
   return row_solution_stack;
 }
 
