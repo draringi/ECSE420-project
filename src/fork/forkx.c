@@ -9,6 +9,8 @@ void remove_column(struct MATRIX* matrix, int col_id);
 
 #define INT_DEC_LEN 10
 
+pid_t pid;
+
 struct STACK {
   int value;
   struct STACK* next;
@@ -35,6 +37,19 @@ void forkx(struct MATRIX* matrix) {
   while(matrix->columns){
     struct MATRIX_COL* col = matrix->columns;
     if(matrix->min_cardinality==0){
+      if(col){
+        do{
+          col = col->right;
+          free(col->left);
+        } while (col != matrix->columns);
+      }
+      struct MATRIX_ROW* row = matrix->rows;
+      if(row){
+        do{
+          row = row->down;
+          free(row->up);
+        } while (row != matrix->rows);
+      }
       free(results);
       return;
     }
@@ -42,7 +57,7 @@ void forkx(struct MATRIX* matrix) {
       col = col->right;
     }
     struct MATRIX_ENTRY* entry = col->top;
-    pid_t pid = 0;
+    pid = 0;
     while(entry->down != col->top && pid == 0){
       pid = fork();
       if(pid==0){
@@ -112,6 +127,7 @@ void clean_row(struct MATRIX* matrix, int row_id){
           matrix->rows = rem_row->down;
         }
       }
+      free(rem_row);
     }
     remove_column(matrix, row_entry->x);
     row_entry = row_entry->right;
@@ -125,6 +141,7 @@ void clean_row(struct MATRIX* matrix, int row_id){
       matrix->rows = row->down;
     }
   }
+  free(row);
 }
 
 void remove_column(struct MATRIX* matrix, int col_id){
@@ -141,4 +158,5 @@ void remove_column(struct MATRIX* matrix, int col_id){
       matrix->columns = col->right;
     }
   }
+  free(col);
 }

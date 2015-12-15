@@ -1,15 +1,16 @@
 .PHONY: all clean check
 
-LDFLAGS:=-lfl -Wall -g
-CFLAGS:=-c -Wall -g -fstack-protector -I.
+LDFLAGS:= --linker-options -lfl -g
+CFLAGS:= -c -g --compiler-options -fstack-protector,-Wall,-pipe -I.
 GENFILES:= common/parser.yy.h common/parser.yy.c common/parser.tab.h common/parser.tab.c
 COMMON_OBJ:=  common/parser.yy.o common/parser.tab.o common/matrix.o
 PRINT_OBJ:= common/printer.o
 SEQ_OBJ:= sequential/main.o sequential/dlx.o
 FORK_OBJ:= fork/main.o fork/forkx.o
-OBJFILES:= $(COMMON_OBJ)
-BINFILES:= sparse-print cover-seq cover-fork
-CUDACC:=nvcc
+CUDA_OBJ:= cuda/main.o cuda/cudax.o
+OBJFILES:= $(COMMON_OBJ) $(SEQ_OBJ) $(FORK_OBJ) $(CUDA_OBJ)
+BINFILES:= sparse-print cover-seq cover-fork cover-cuda
+CC:=nvcc
 
 all: $(BINFILES)
 
@@ -21,6 +22,9 @@ cover-seq: $(COMMON_OBJ) $(SEQ_OBJ)
 
 cover-fork: $(COMMON_OBJ) $(FORK_OBJ)
 	@$(CC) $(LDFLAGS) $(COMMON_OBJ) $(FORK_OBJ) -o cover-fork
+
+cover-cuda: $(COMMON_OBJ) $(CUDA_OBJ)
+	@$(CC) $(LDFLAGS) $(COMMON_OBJ) $(CUDA_OBJ) -o cover-cuda
 
 common/printer.o: common/printer.c common/matrix.h common/parser.yy.h
 	@$(CC) $(CFLAGS) common/printer.c -o common/printer.o
@@ -56,6 +60,11 @@ fork/main.o: fork/main.c common/parser.yy.h common/matrix.h fork/forkx.h
 fork/forkx.o: fork/forkx.c fork/forkx.h common/matrix.h
 	@$(CC) $(CFLAGS) fork/forkx.c -o fork/forkx.o
 
+cuda/main.o: cuda/main.c common/parser.yy.h common/matrix.h
+	@$(CC) $(CFLAGS) cuda/main.c -o cuda/main.o
+
+cuda/cudax.o: cuda/cudax.cu cuda/cudax.h
+	@$(CC) $(CFLAGS) cuda/cudax.cu -o cuda/cudax.o
 
 clean:
 	-@$(RM) $(GENFILES) $(OBJFILES) $(BINFILES)

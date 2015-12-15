@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <limits.h>
+#include <stdint.h>
 
 struct ENTRY_LIST {
 	struct MATRIX_ENTRY *entry;
@@ -276,4 +277,28 @@ void recalculate_cardinality(struct MATRIX* matrix) {
 		}
 	} while (col != matrix->columns);
 	matrix->min_cardinality = min_cardinality;
+}
+
+struct MATRIX_ENTRY* copy_matrix_entries(size_t *size){
+	struct ENTRY_LIST* list = entry_list;
+	*size = 0;
+	while(list){
+		(*size)++;
+		list = list->next;
+	}
+	struct MATRIX_ENTRY* entries = calloc(*size, sizeof(struct MATRIX_ENTRY));
+	list = entry_list;
+	int i = 0;
+	while(list){
+		entries[i++] = *(list->entry);
+		list = list->next;
+	}
+	return entries;
+}
+
+uint32_t get_matrix_height(void){
+	return size_y;
+}
+uint32_t get_matrix_width(void){
+	return size_x;
 }

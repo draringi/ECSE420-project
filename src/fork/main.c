@@ -28,12 +28,13 @@ int main(int argc, char const *argv[]) {
   link_matrix();
   struct MATRIX *matrix = get_matrix();
   forkx(matrix);
+  free(matrix);
   wait_for_children();
   return EXIT_SUCCESS;
 }
 
 void wait_for_children(void){
-  int status;
+  int status = 0;
   do{
     wait(&status);
     if(status == -1 && errno != ECHILD){

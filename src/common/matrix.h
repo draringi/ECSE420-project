@@ -2,7 +2,7 @@
 #define MATRIX_H
 
 #include <stdint.h>
-
+#include <stdlib.h>
 int yyparse(void);
 
 struct MATRIX_ENTRY {
@@ -42,5 +42,7 @@ void clean_matrix(void);
 struct MATRIX* get_matrix(void);
 void recalculate_cardinality(struct MATRIX*);
 void free_matrix_object(struct MATRIX* matrix);
-
+struct MATRIX_ENTRY* copy_matrix_entries(size_t *size);
+uint32_t get_matrix_height(void);
+uint32_t get_matrix_width(void);
 #endif /* MATRIX_H */
