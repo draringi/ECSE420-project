@@ -3,6 +3,6 @@
 
 #include "common/matrix.h"
 
-void forkx(struct MATRIX* matrix);
+int forkx(struct MATRIX* matrix);
 
 #endif /* FORKX_H */

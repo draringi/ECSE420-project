@@ -31,7 +31,7 @@ int pop_stack(struct STACK** stack){
   return value;
 }
 
-void forkx(struct MATRIX* matrix) {
+int forkx(struct MATRIX* matrix) {
   int* results = calloc(matrix->yLen, sizeof(int));
   int result_count = 0;
   while(matrix->columns){
@@ -51,7 +51,7 @@ void forkx(struct MATRIX* matrix) {
         } while (row != matrix->rows);
       }
       free(results);
-      return;
+      return 0;
     }
     while(col->cardinality != matrix->min_cardinality){
       col = col->right;
@@ -80,6 +80,7 @@ void forkx(struct MATRIX* matrix) {
   free(results);
   printf("%s\n", results_str);
   free(results_str);
+  return 1;
 }
 
 void clean_row(struct MATRIX* matrix, int row_id){

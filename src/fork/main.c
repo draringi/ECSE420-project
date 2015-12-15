@@ -27,9 +27,11 @@ int main(int argc, char const *argv[]) {
   build_starts();
   link_matrix();
   struct MATRIX *matrix = get_matrix();
-  forkx(matrix);
+  int result = forkx(matrix);
   free(matrix);
-  wait_for_children();
+  if(!result){
+    wait_for_children();
+  }
   return EXIT_SUCCESS;
 }
 
