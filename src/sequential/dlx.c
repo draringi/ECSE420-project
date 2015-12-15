@@ -64,15 +64,21 @@ struct DLX_STACK* dlx(struct MATRIX* matrix){
     // Minus 1 means reached end of rows available. Should backtrack.
     // As this is a stack, this gets entered before the rows available.
     dlx_stack_push(&row_check_stack, -1);
-    do {
-      dlx_stack_push(&row_check_stack, entry->y);
-      entry = entry->down;
-    } while (entry!=col->top);
+    if(entry){
+      do {
+        dlx_stack_push(&row_check_stack, entry->y);
+        entry = entry->down;
+      } while (entry!=col->top);
+    }
     if(!row_check_stack){
       break;
     }
     int row_id = dlx_stack_pop(&row_check_stack);
     while(row_id==-1){
+      if(!row_solution_stack){
+        row_id = -2;
+        break;
+      }
       dlx_stack_pop(&row_solution_stack);
       int replace_id = dlx_stack_pop(&column_stack);
       while(replace_id!=-1){
@@ -85,6 +91,9 @@ struct DLX_STACK* dlx(struct MATRIX* matrix){
         replace_id = dlx_stack_pop(&row_remove_stack);
       }
       row_id = dlx_stack_pop(&row_check_stack);
+    }
+    if(row_id == -2){
+      break;
     }
     dlx_stack_push(&row_solution_stack, row_id);
     dlx_remove_row(row_index, column_index, row_id, -1);
@@ -125,7 +134,11 @@ void dlx_remove_row(struct MATRIX_ROW** index, struct MATRIX_COL** cols, int id,
   do{
     dlx_delink_vertical(node);
     if(node->x != col_id && cols[node->x]->top == node){
-      cols[node->x]->top = node->down;
+      if (node->down == node) {
+        cols[node->x]->top = NULL;
+      } else {
+        cols[node->x]->top = node->down;
+      }
     }
     node = node->right;
   } while (node != row->start);
@@ -144,6 +157,9 @@ void dlx_remove_column(struct DLX_STACK ** row_stack, struct MATRIX* matrix, str
   }
   struct DLX_STACK* rows_to_remove = NULL;
   struct MATRIX_ENTRY* node = col->top;
+  if(!node){
+    return;
+  }
   do{
     dlx_stack_push(&rows_to_remove, node->y);
     dlx_stack_push(row_stack, node->y);

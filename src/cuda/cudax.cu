@@ -173,7 +173,7 @@ uint64_t factorial(uint32_t n){
     value *= n;
     --n;
   }
-  return n;
+  return value;
 }
 
 void find_cover(struct MATRIX_ENTRY* entries_list, size_t list_size, uint32_t width, uint32_t height){
@@ -184,11 +184,13 @@ void find_cover(struct MATRIX_ENTRY* entries_list, size_t list_size, uint32_t wi
     cardinalities[col]++;
   }
   uint64_t cardinality_product = 1;
-  for(i=0; i<list_size; i++){
+  for(i=0; i<width; i++){
     cardinality_product *= cardinalities[i];
   }
+  free(cardinalities);
   uint64_t row_factorial = factorial(height);
   uint64_t cores = (cardinality_product > row_factorial) ? row_factorial : cardinality_product;
+  printf("n! = %lu\ncardinality Product = %lu\nCores: %lu\n", row_factorial, cardinality_product, cores);
   void* data_array;
   size_t len = list_size*sizeof(struct MATRIX_ENTRY);
   size_t array_size = cores*len;
@@ -211,8 +213,9 @@ void find_cover(struct MATRIX_ENTRY* entries_list, size_t list_size, uint32_t wi
   }
   solve_cover<<<cores, 1>>>((struct MATRIX_ENTRY*)data_array, (int*)results, list_size, width, height);
   int* local_results = (int*) malloc(results_size);
-  err = cudaMemcpy(results, local_results, results_size, cudaMemcpyDeviceToHost);
+  err = cudaMemcpy(local_results, results, results_size, cudaMemcpyDeviceToHost);
   if(err != cudaSuccess){
+    fprintf(stderr, "Error %d: %s\n", err,cudaGetErrorString(err));
     abort();
   }
   size_t success_count = 0;
@@ -236,4 +239,7 @@ void find_cover(struct MATRIX_ENTRY* entries_list, size_t list_size, uint32_t wi
   if(success_count == 0){
     printf("No Solutions Found\n");
   }
+  cudaFree(data_array);
+  cudaFree(results);
+  free(local_results);
 }
